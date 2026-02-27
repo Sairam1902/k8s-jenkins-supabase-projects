@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>K8s Supabase App</title>
+</head>
+<body>
+  <h2>Message App</h2>
+
+  <input type="text" id="message" placeholder="Enter message">
+  <button onclick="sendMessage()">Submit</button>
+
+  <h3>All Messages:</h3>
+  <ul id="list"></ul>
+
+<script>
+const BACKEND_URL = "http://3.80.87.61:3000"; // temporary (we’ll fix later)
+
+async function sendMessage() {
+  const text = document.getElementById("message").value;
+
+  await fetch(`${BACKEND_URL}/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  loadMessages();
+}
+
+async function loadMessages() {
+  const res = await fetch(`${BACKEND_URL}/all`);
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(msg => {
+    const li = document.createElement("li");
+    li.innerText = msg.text;
+    list.appendChild(li);
+  });
+}
+
+loadMessages();
+</script>
+
+</body>
+</html>
