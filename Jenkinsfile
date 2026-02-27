@@ -9,21 +9,15 @@ pipeline {
 
     stages {
 
-        stage('Clone') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $sairamb1902/$backend ./backend'
+                sh "docker build -t ${DOCKER_USER}/${BACKEND_IMAGE}:latest ./backend"
             }
         }
 
         stage('Build Frontend Image') {
             steps {
-                sh 'docker build -t $sairamb1902/$frontend ./frontend'
+                sh "docker build -t ${DOCKER_USER}/${FRONTEND_IMAGE}:latest ./frontend"
             }
         }
 
@@ -34,22 +28,24 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
                 }
             }
         }
 
         stage('Push Images') {
             steps {
-                sh 'docker push $sairamb1902/backend'
-                sh 'docker push $sairamb1902/frontend'
+                sh "docker push ${DOCKER_USER}/${BACKEND_IMAGE}:latest"
+                sh "docker push ${DOCKER_USER}/${FRONTEND_IMAGE}:latest"
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f backend/backend-deployment.yaml'
-                sh 'kubectl apply -f frontend/frontend-deployment.yaml'
+                sh "kubectl apply -f backend/backend-deployment.yaml"
+                sh "kubectl apply -f frontend/frontend-deployment.yaml"
+                sh "kubectl rollout restart deployment backend"
+                sh "kubectl rollout restart deployment frontend"
             }
         }
     }
