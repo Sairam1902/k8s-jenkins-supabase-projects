@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: frontend-app
-        imagePullPolicy: Never
+        image: sairamb1902/frontend-app:latest
         ports:
         - containerPort: 80
 ---

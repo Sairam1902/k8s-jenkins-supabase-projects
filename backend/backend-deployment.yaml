@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: backend-app
-        imagePullPolicy: Never
+        image: sairamb1902/backend-app:latest
         ports:
         - containerPort: 3000
 ---
